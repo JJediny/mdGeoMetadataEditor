@@ -1,0 +1,65 @@
+pipeline: 
+  stages: 
+    - name: 
+      failFast: false
+      agent: 
+        type: 
+        arguments: 
+        argument: 
+          isLiteral: false
+          value: null
+      when: 
+        conditions: 
+          - 
+      post: 
+        conditions: 
+          - condition: 
+            branch: 
+              name: 
+              steps: 
+                - 
+      tools: 
+        - key: 
+          value: 
+            isLiteral: false
+            value: null
+      environment: 
+        - key: 
+          value: 
+      branches: 
+  post: 
+    conditions: 
+      - condition: 
+        branch: 
+          name: 
+          steps: 
+            - 
+  environment: 
+    - key: 
+      value: 
+  agent: 
+    type: 
+    arguments: 
+    argument: 
+      isLiteral: false
+      value: null
+  tools: 
+    - key: 
+      value: 
+        isLiteral: false
+        value: null
+  options: 
+    options: 
+      - name: 
+        arguments: 
+  triggers: 
+    triggers: 
+      - name: 
+        arguments: 
+          - 
+  parameters: 
+    parameters: 
+      - name: 
+        arguments: 
+  libraries: 
+    - 

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ site.title }}</title>
+
+    <!-- Foundation CSS framework (Bootstrap and jQueryUI also supported) -->
+    <link rel='stylesheet' href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+    <!-- Font Awesome icons (Bootstrap, Foundation, and jQueryUI also supported) -->
+    <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css'>
+
+    <link rel='stylesheet' href='assets/css/style.css'>
+    <script src="//code.jquery.com/jquery-1.12.2.min.js" integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk=" crossorigin="anonymous"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <script src="assets/js/jsoneditor.js"></script>
+    <script src="assets/js/json2yaml.js"></script>
+    <!-- SimpleMDE Simple Markdown Editor -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <!-- Hypothesis annotator -->
+    <!-- <script async defer src="//hypothes.is/embed.js"></script> -->
+
+    <script>
+    // Set the default CSS theme and icon library globally
+    JSONEditor.defaults.options.theme = 'bootstrap3';
+    JSONEditor.defaults.options.iconlib = 'bootstrap3';
+    JSONEditor.defaults.options.disable_edit_json = 'true';
+    </script>
+
+  </head>
+  <body>
+    <div class='row'>
+      <div class='col-sm-12 col-md-6'>
+        <h1><img src="https://www.fgdc.gov/iso-metadata-editors-registry/assets/fgdclogo-220abcc90ba286b43ea8352d594b4c1d.png" alt="Open Control Logo" height="60" width="60">Geospatial Metadata Editor</h1>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-sm-12 col-md-6'>
+        <button type='button' class='btn btn-default pull-left' data-toggle="modal" data-target="#markdown-modal">Markdown Editor</button>
+        <button id='generate' type='button' class='btn btn-danger pull-right' data-toggle="modal" data-target="#yaml-modal">Generate</button>
+        <span id='valid_indicator' class='label'></span>
+      </div>
+    </div>
+    <div id='editor_holder' class='col-sm-12 col-md-6'></div>
+    <!-- YAML Modal -->
+    <div id="yaml-modal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">YAML Output</h4>
+          </div>
+          <div class="modal-body">
+            <div id='editor_holder' class='well'>
+              <textarea id='yamloutput' class='yamlwindow' style="width: 100%"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+      <!-- Markdown Modal -->
+    <div id="markdown-modal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Markdown Editor</h4>
+          </div>
+          <div class="modal-body">
+            <textarea id="markdown-editor" style="display: none;"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      $.getJSON('schema.json', function(data) {
+
+        // Initialize the editor
+        var editor = new JSONEditor(document.getElementById('editor_holder'),{
+          // Enable fetching schemas via ajax
+          ajax: true,
+
+          // The schema for the editor
+          schema: data
+
+        });
+        // Hook up the generate button to output to the text field
+        document.getElementById('generate').addEventListener('click',function() {
+          // Get the value from the editor
+          var yaml = json2yaml(editor.getValue());
+          console.log(editor.getValue());
+          $("#yamloutput").val(yaml);
+          console.log(yaml);
+        });
+
+        // Hook up the validation indicator to update its
+        // status whenever the editor changes
+        editor.on('change',function() {
+          // Get an array of errors from the validator
+          var errors = editor.validate();
+
+          var indicator = document.getElementById('valid_indicator');
+
+          // Not valid
+          if(errors.length) {
+            indicator.className = 'label alert';
+            indicator.textContent = 'not valid';
+          }
+          // Valid
+          else {
+            indicator.className = 'label success';
+            indicator.textContent = 'valid';
+            var yaml = json2yaml(editor.getValue());
+            $("#yamloutput").val(yaml);
+          }
+        });
+      });
+      new SimpleMDE({
+        element: document.getElementById("markdown-editor"),
+        spellChecker: true,
+        autosave: {
+          enabled: true,
+          unique_id: "markdown-editor",
+        },
+      });
+      </script>
+    </script>
+  </body>
+</html>
